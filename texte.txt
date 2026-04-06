@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Judo Bilan">
+<meta name="theme-color" content="#002654">
+<title>Judo Bilan — France Judo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#002654; --navy2:#001a3a; --navy-l:#e8edf5;
+  --red:#CE1126; --red-l:#fdf0f1; --red-b:#f5b0b8;
+  --green:#1a6b3a; --green-bg:#edf7f2; --green-brd:#a8d5bb;
+  --amber:#7a4800; --amber-bg:#fdf6e8; --amber-brd:#e8c97a;
+  --ink:#111; --ink2:#2a2a2a; --muted:#7a7a7a; --line:#dde3ed; --bg:#edf0f5;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--navy);color:var(--ink)}
+
+/* ── SCREENS ── */
+.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen.active{display:flex}
+
+/* ══ LISTE ══ */
+.list-header{padding:20px 18px 14px;flex-shrink:0}
+.list-logo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.flag{display:flex;height:16px;border-radius:2px;overflow:hidden;width:26px}
+.flag div{flex:1}
+.fb{background:var(–navy)}.fw{background:white}.fr{background:var(–red)}
+.list-brand{font-family:‘Syne’,sans-serif;font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#7a95bb}
+.list-title{font-family:‘Syne’,sans-serif;font-size:24px;font-weight:800;color:white;margin-bottom:3px}
+.list-sub{font-size:11px;color:#7a95bb}
+
+.btn-new{width:100%;background:var(–red);border:none;color:white;font-family:‘Syne’,sans-serif;font-size:13px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0}
+.btn-new:active{background:#a50e1e}
+
+.list-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 14px 30px}
+.empty{text-align:center;padding:50px 20px;color:#3a5a7a}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-family:‘Syne’,sans-serif;font-size:13px;font-weight:700;color:#4a6a8a;margin-bottom:5px}
+.empty-sub{font-size:11px}
+
+.fcard{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:13px 14px;margin-bottom:9px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.fcard:active{background:rgba(255,255,255,.14)}
+.fcard-left{flex:1;min-width:0}
+.fcard-name{font-family:‘Syne’,sans-serif;font-size:14px;font-weight:800;color:white;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.fcard-meta{font-size:11px;color:#7a95bb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fcard-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.rdot{width:9px;height:9px;border-radius:50%}
+.dot-or{background:#ffd700}.dot-ar{background:#d8d8d8}.dot-br{background:#d4a574}
+.dot-5{background:var(–green)}.dot-7{background:#999}.dot-el{background:var(–red)}
+.fcard-del{background:transparent;border:none;color:rgba(255,255,255,.25);font-size:22px;cursor:pointer;padding:0 4px;line-height:1}
+.fcard-arrow{color:#4a6a8a;font-size:18px}
+
+/* ══ ÉDITEUR ══ */
+#screen-edit{background:var(–bg)}
+.topbar{background:var(–navy);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar-back{background:transparent;border:none;color:white;font-size:26px;cursor:pointer;line-height:1;padding:0 4px;flex-shrink:0}
+.topbar-title{font-family:‘Syne’,sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:white;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.topbar-guide{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);font-family:‘Syne’,sans-serif;font-size:10px;font-weight:800;padding:7px 10px;border-radius:2px;cursor:pointer;flex-shrink:0}
+.topbar-pdf{background:var(–red);border:none;color:white;font-family:‘Syne’,sans-serif;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:8px 12px;border-radius:2px;cursor:pointer;flex-shrink:0}
+.topbar-pdf:active{background:#a50e1e}
+
+.edit-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* ── Header fiche ── */
+.hd{background:var(–navy)}
+.stripe{display:flex;height:4px}
+.sb{flex:1;background:var(–navy)}.sw{flex:1;background:white}.sr{flex:1;background:var(–red)}
+.hd-inner{padding:14px 16px}
+.hd-eyebrow{font-family:‘Syne’,sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#7a95bb;margin-bottom:4px}
+.hd-name{font-family:‘Syne’,sans-serif;font-size:24px;font-weight:800;line-height:1;background:transparent;border:none;color:white;text-transform:uppercase;width:100%;outline:none}
+.hd-name::placeholder{color:#3a5a7a}
+.hd-row2{display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px;gap:10px}
+.hd-fields{display:flex;flex-direction:column;gap:6px;flex:1}
+.hd-field-row{display:flex;align-items:center;gap:6px}
+.hd-field-row span{font-size:12px}
+.hdinput{background:transparent;border:none;border-bottom:1px solid #1a3a5e;color:#c0d0e0;font-family:‘Inter’,sans-serif;font-size:11px;padding:2px;flex:1;outline:none}
+.hd-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.rpill{font-family:‘Syne’,sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:5px 11px;border-radius:2px}
+.res-or{background:#ffd700;color:#3a2a00}.res-ar{background:#d8d8d8;color:#222}.res-br{background:#d4a574;color:#2a1000}
+.res-5{background:var(–green-bg);color:var(–green);border:1px solid var(–green-brd)}
+.res-7{background:#f0f0f0;color:#666}
+.res-el{background:var(–red-l);color:var(–red);border:1px solid var(–red-b)}
+.rpill select{appearance:none;background:transparent;border:none;font-family:‘Syne’,sans-serif;font-size:9px;font-weight:800;cursor:pointer;color:inherit;text-transform:uppercase;outline:none}
+.hd-comp input{background:transparent;border:none;border-bottom:1px solid #1a3a5e;color:#7a95bb;font-family:‘Inter’,sans-serif;font-size:10px;text-align:right;display:block;margin-bottom:3px;outline:none}
+
+/* ── Corps fiche ── */
+.fiche-body{padding:12px 13px 50px;background:white}
+.sec-label{font-family:‘Syne’,sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(–navy);padding:10px 0 6px;border-bottom:2px solid var(–navy);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-label span{flex:1}
+.sec-add{font-family:‘Inter’,sans-serif;font-size:10px;font-weight:600;background:transparent;border:1px solid var(–line);color:var(–muted);padding:4px 12px;cursor:pointer;border-radius:2px}
+
+/* ══ COMBAT CARD ══ */
+.cc{margin-bottom:14px;border-radius:6px;overflow:hidden;box-shadow:0 2px 8px rgba(0,38,84,.07);border:1.5px solid var(–line)}
+.cc.cv{border-left:4px solid var(–green)}.cc.cd{border-left:4px solid var(–red)}.cc.cn{border-left:4px solid var(–line)}
+
+.cc-head{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid var(–line)}
+.cc-num{width:26px;height:26px;border-radius:50%;background:var(–navy);color:white;display:flex;align-items:center;justify-content:center;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
+.cc-badge{font-family:‘Syne’,sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:20px;flex-shrink:0;display:flex;align-items:center}
+.ccb-v{background:var(–green-bg);color:var(–green);border:1px solid var(–green-brd)}
+.ccb-d{background:var(–red-l);color:var(–red);border:1px solid var(–red-b)}
+.ccb-n{background:#f0f0f0;color:#888}
+.cc-badge select{appearance:none;background:transparent;border:none;font-family:‘Syne’,sans-serif;font-size:9px;font-weight:800;cursor:pointer;color:inherit;text-transform:uppercase;outline:none}
+.cc-adv{background:transparent;border:none;border-bottom:1px solid var(–line);font-family:‘Inter’,sans-serif;font-size:12px;font-weight:500;color:var(–ink2);flex:1;padding:1px 2px;outline:none;min-width:0}
+.cc-adv::placeholder{color:#ccc}
+.cc-del{background:transparent;border:none;color:#ddd;cursor:pointer;font-size:20px;padding:0 2px;flex-shrink:0}
+
+/* Profil */
+.cc-profile{padding:8px 11px;background:var(–navy-l);border-bottom:1px solid var(–line)}
+.cc-profile-title{font-family:‘Syne’,sans-serif;font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(–navy);margin-bottom:6px;padding-bottom:3px;border-bottom:1.5px solid var(–navy)}
+.profile-row{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid #c8d4e4}
+.profile-key{font-size:8px;color:var(–navy);width:58px;flex-shrink:0;font-weight:800;text-transform:uppercase;letter-spacing:1px;background:rgba(0,38,84,.07);padding:2px 4px;border-radius:2px;text-align:center}
+.profile-chips{display:flex;gap:3px;flex-wrap:wrap}
+.pchip{font-family:‘Inter’,sans-serif;font-size:9px;font-weight:600;padding:3px 8px;border-radius:20px;cursor:pointer;border:1px solid #b0c0d8;background:white;color:#4a6a8a;user-select:none;-webkit-user-select:none}
+.pchip.active{background:var(–navy);color:white;border-color:var(–navy)}
+.profile-obs{width:100%;background:transparent;border:none;border-bottom:1px solid #b0c0d8;font-family:‘Inter’,sans-serif;font-size:10px;color:var(–ink2);margin-top:6px;padding:2px;outline:none}
+.profile-obs::placeholder{color:#aab8cc;font-style:italic}
+
+/* Scores compact */
+.cc-scores{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(–line);background:#fafafa}
+.cc-score-col{padding:6px 10px}
+.cc-score-col:first-child{border-right:1px solid var(–line)}
+.score-title{font-family:‘Syne’,sans-serif;font-size:7px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;padding-bottom:3px;border-bottom:1.5px solid currentColor}
+.sct-m{color:var(–green)}.sct-c{color:var(–red)}
+.score-row{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:3px}
+.score-lbl{font-size:10px;color:var(–muted);flex:1}
+.counter{display:flex;align-items:center;gap:3px}
+.cnt-btn{width:22px;height:22px;border:1px solid var(–line);background:white;font-size:13px;cursor:pointer;border-radius:3px;color:var(–muted);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cnt-btn:active{background:var(–navy);color:white;border-color:var(–navy)}
+.cnt-val{font-family:‘Syne’,sans-serif;font-size:14px;font-weight:800;min-width:18px;text-align:center;line-height:1}
+.cv-g{color:var(–green)}.cv-r{color:var(–red)}.cv-a{color:var(–amber)}.cv-b{color:var(–navy)}
+
+/* Observations grandes */
+.cc-obs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(–line)}
+.cc-obs-col{padding:11px 12px}
+.cc-obs-col:first-child{border-right:1px solid var(–line)}
+.obs-title{font-family:‘Syne’,sans-serif;font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1.5px solid currentColor}
+.obs-pos{color:var(–green)}.obs-neg{color:var(–red)}
+
+.mini-list{display:flex;flex-direction:column;gap:1px;margin-bottom:5px}
+.mini-item{display:flex;align-items:flex-start;gap:6px;padding:2px 0}
+.mini-dot{width:6px;height:6px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.mini-text{flex:1;font-size:13px;color:var(–ink2);line-height:1.5;padding:2px 0;min-height:22px;cursor:text;border-bottom:1px solid transparent}
+.mini-text.placeholder{color:#bbb;font-style:italic}
+.mini-input{flex:1;background:#fffbe6;border:none;border-bottom:1.5px solid currentColor;font-family:‘Inter’,sans-serif;font-size:13px;color:var(–ink2);padding:3px 5px;outline:none}
+.mini-add-btn{font-size:11px;background:transparent;border:none;cursor:pointer;font-family:‘Inter’,sans-serif;opacity:0.5;padding:3px 0;display:flex;align-items:center;gap:3px}
+
+/* À travailler */
+.cc-work{display:grid;grid-template-columns:1fr 1fr 1fr;background:#f4f6fb}
+.cc-work-col{padding:10px 11px}
+.cc-work-col:not(:last-child){border-right:1px solid var(–line)}
+.work-title{font-family:‘Syne’,sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid var(–line);display:flex;align-items:center;gap:5px;color:var(–ink2)}
+.wdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.wd-t{background:var(–red)}.wd-a{background:var(–navy)}.wd-m{background:#5a1a8a}
+.work-list{display:flex;flex-direction:column;gap:1px;margin-bottom:5px}
+.work-item{display:flex;align-items:flex-start;gap:5px;padding:2px 0}
+.work-n{font-size:10px;font-weight:700;color:var(–muted);min-width:14px;margin-top:3px}
+.work-text{flex:1;font-size:12px;color:var(–ink2);line-height:1.5;min-height:20px;cursor:text}
+.work-text.placeholder{color:#bbb;font-style:italic}
+.work-input{flex:1;background:#fffbe6;border:none;border-bottom:1.5px solid var(–line);font-family:‘Inter’,sans-serif;font-size:12px;color:var(–ink2);padding:3px 5px;outline:none}
+.work-add-btn{font-size:11px;background:transparent;border:none;cursor:pointer;color:var(–muted);opacity:0.4;padding:2px 0}
+
+/* Priorités */
+.priority-block{border:2px solid var(–navy);border-radius:6px;overflow:hidden;margin-bottom:12px}
+.prio-header{background:var(–navy);padding:9px 14px}
+.prio-header-title{font-family:‘Syne’,sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:white}
+.prio-accent{height:3px;background:var(–red)}
+.prio-body{padding:10px 14px;display:flex;flex-direction:column;gap:6px}
+.prio-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:4px;border-left:4px solid;background:#f8f9fc}
+.prio-1{border-color:var(–red)}.prio-2{border-color:var(–amber)}.prio-3{border-color:var(–navy)}
+.prio-num{font-family:‘Syne’,sans-serif;font-size:16px;font-weight:800;min-width:18px;text-align:center;line-height:1}
+.pn-1{color:var(–red)}.pn-2{color:var(–amber)}.pn-3{color:var(–navy)}
+.prio-input{background:transparent;border:none;font-family:‘Inter’,sans-serif;font-size:12px;font-weight:500;color:var(–ink2);width:100%;outline:none}
+.prio-input::placeholder{color:#bbb;font-style:italic}
+.prio-del{background:transparent;border:none;color:#ccc;cursor:pointer;font-size:16px;padding:0;flex-shrink:0}
+.prio-add{font-family:‘Inter’,sans-serif;font-size:11px;font-weight:600;background:transparent;border:1px dashed var(–line);color:var(–muted);padding:8px;cursor:pointer;border-radius:4px;text-align:center;width:calc(100% - 28px);margin:0 14px 12px;display:block}
+
+/* Note coach */
+.coach-row{background:var(–amber-bg);border:1.5px solid var(–amber-brd);border-radius:4px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.coach-label{font-family:‘Syne’,sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(–amber);white-space:nowrap;margin-top:2px;min-width:48px;line-height:1.6}
+.coach-input{flex:1;background:transparent;border:none;font-family:‘Inter’,sans-serif;font-size:12px;line-height:1.6;color:var(–ink2);resize:none;width:100%;outline:none;min-height:40px}
+.coach-input::placeholder{color:#c8b880;font-style:italic}
+
+/* ══ MODAL ══ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:white;border-radius:10px;padding:24px 20px;max-width:320px;width:100%;text-align:center}
+.modal-title{font-family:‘Syne’,sans-serif;font-size:15px;font-weight:800;color:var(–navy);margin-bottom:8px}
+.modal-text{font-size:12px;color:var(–muted);margin-bottom:20px;line-height:1.5}
+.modal-btns{display:flex;gap:10px}
+.modal-btn{flex:1;padding:11px;border-radius:4px;border:none;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;cursor:pointer}
+.modal-cancel{background:#f0f0f0;color:var(–muted)}
+.modal-confirm{background:var(–red);color:white}
+
+/* ══ GUIDE PDF ══ */
+.guide-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:998;align-items:center;justify-content:center;padding:20px}
+.guide-overlay.active{display:flex}
+.guide{background:white;border-radius:12px;padding:24px 20px;max-width:340px;width:100%;max-height:90vh;overflow-y:auto}
+.guide-title{font-family:‘Syne’,sans-serif;font-size:15px;font-weight:800;color:var(–navy);margin-bottom:4px;text-align:center}
+.guide-sub{font-size:11px;color:var(–muted);margin-bottom:16px;text-align:center}
+.guide-tabs{display:flex;gap:8px;margin-bottom:20px}
+.guide-tab{flex:1;padding:10px 0;border-radius:6px;border:2px solid var(–line);background:white;color:var(–muted);font-family:‘Syne’,sans-serif;font-size:12px;font-weight:800;cursor:pointer}
+.guide-tab.active{border-color:var(–navy);background:var(–navy);color:white}
+.guide-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px}
+.guide-step-n{width:24px;height:24px;border-radius:50%;background:var(–navy);color:white;display:flex;align-items:center;justify-content:center;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:800;flex-shrink:0}
+.guide-step-text{font-size:12px;color:var(–ink2);line-height:1.5;flex:1}
+.guide-close{width:100%;margin-top:8px;padding:12px;border-radius:6px;border:none;background:var(–red);color:white;font-family:‘Syne’,sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+
+/* ══ APERÇU PDF ══ */
+#screen-preview{background:#444}
+.preview-bar{background:#222;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.preview-back{background:transparent;border:none;color:white;font-size:24px;cursor:pointer;padding:0 4px}
+.preview-title{font-family:‘Syne’,sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:white;flex:1}
+.preview-hint{background:var(–red);border-radius:4px;padding:6px 10px;text-align:center;flex-shrink:0}
+.preview-hint div{font-size:9px;color:white;font-weight:700;white-space:nowrap}
+.preview-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px}
+.preview-paper{background:white;max-width:680px;margin:0 auto;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+
+/* ══ PRINT ══ */
+@media print {
+body{background:white!important;overflow:visible!important;height:auto!important}
+#screen-list,#screen-edit,#screen-preview .preview-bar{display:none!important}
+#screen-preview{display:block!important;height:auto!important;overflow:visible!important;background:white!important}
+.preview-scroll{overflow:visible!important;padding:0!important}
+.preview-paper{box-shadow:none!important;max-width:100%!important}
+@page{size:A4 portrait;margin:8mm}
+}
+</style>
+
+</head>
+<body>
+
+<!-- ══ LISTE ══ -->
+
+<div id="screen-list" class="screen active">
+  <div class="list-header">
+    <div class="list-logo">
+      <div class="flag"><div class="fb"></div><div class="fw"></div><div class="fr"></div></div>
+      <span class="list-brand">France Judo</span>
+    </div>
+    <div class="list-title">Fiches Bilan</div>
+    <div class="list-sub">Compétition · Analyse individuelle</div>
+  </div>
+  <button class="btn-new" onclick="newFiche()"><span style="font-size:20px;font-weight:300">＋</span> Nouvelle fiche</button>
+  <div class="list-scroll">
+    <div class="empty" id="empty">
+      <div class="empty-icon">🥋</div>
+      <div class="empty-title">Aucune fiche</div>
+      <div class="empty-sub">Appuie sur "Nouvelle fiche" pour commencer</div>
+    </div>
+    <div id="list-items"></div>
+  </div>
+</div>
+
+<!-- ══ ÉDITEUR ══ -->
+
+<div id="screen-edit" class="screen">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goBack()">‹</button>
+    <div class="topbar-title" id="topbar-title">Nouvelle fiche</div>
+    <button class="topbar-guide" onclick="showGuide()">? PDF</button>
+    <button class="topbar-pdf" onclick="showPreview()">🖨 Aperçu</button>
+  </div>
+  <div class="edit-scroll" id="edit-scroll">
+    <div id="fiche-content"></div>
+  </div>
+</div>
+
+<!-- ══ APERÇU ══ -->
+
+<div id="screen-preview" class="screen">
+  <div class="preview-bar">
+    <button class="preview-back" onclick="closePreview()">‹</button>
+    <div class="preview-title" id="preview-title">Aperçu</div>
+    <div class="preview-hint">
+      <div>iPhone : Partager</div>
+      <div>→ Imprimer → PDF</div>
+    </div>
+  </div>
+  <div class="preview-scroll">
+    <div class="preview-paper" id="preview-paper"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL SUPPR ══ -->
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title">Supprimer ?</div>
+    <div class="modal-text">Cette fiche sera définitivement supprimée.</div>
+    <div class="modal-btns">
+      <button class="modal-btn modal-cancel" onclick="closeModal()">Annuler</button>
+      <button class="modal-btn modal-confirm" id="modal-confirm">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GUIDE PDF ══ -->
+
+<div class="guide-overlay" id="guide">
+  <div class="guide">
+    <div class="guide-title">Exporter en PDF</div>
+    <div class="guide-sub">Choisir ton téléphone :</div>
+    <div class="guide-tabs">
+      <button class="guide-tab active" onclick="setGuideOs('iphone',this)">📱 iPhone</button>
+      <button class="guide-tab" onclick="setGuideOs('android',this)">🤖 Android</button>
+    </div>
+    <div id="guide-steps"></div>
+    <button class="guide-close" onclick="closeGuide()">OK compris !</button>
+  </div>
+</div>
+
+<script>
+/* ══ STORAGE ══ */
+const SK = 'judo_v10';
+function load() { try { return JSON.parse(localStorage.getItem(SK)) || []; } catch(e) { return []; } }
+function save(d) { try { localStorage.setItem(SK, JSON.stringify(d)); } catch(e) {} }
+function uid() { return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ══ NAV ══ */
+let currentId = null, pendingDel = null;
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goBack() { saveCurrent(); show('screen-list'); renderList(); }
+
+/* ══ LISTE ══ */
+const DOTS = {or:'dot-or',ar:'dot-ar',br:'dot-br','5':'dot-5','7':'dot-7',el:'dot-el'};
+const RMAP = {or:'res-or',ar:'res-ar',br:'res-br','5':'res-5','7':'res-7',el:'res-el'};
+
+function renderList() {
+  const fiches = load();
+  const el = document.getElementById('list-items');
+  document.getElementById('empty').style.display = fiches.length ? 'none' : 'block';
+  el.innerHTML = '';
+  [...fiches].reverse().forEach(f => {
+    const d = document.createElement('div');
+    d.className = 'fcard';
+    d.innerHTML = `
+      <div class="fcard-left">
+        <div class="fcard-name">${esc(f.name||'Sans nom')}</div>
+        <div class="fcard-meta">${esc([f.comp,f.date].filter(Boolean).join(' · ')||'—')}</div>
+      </div>
+      <div class="fcard-right">
+        <div class="rdot ${DOTS[f.result]||'dot-el'}"></div>
+        <button class="fcard-del" onclick="event.stopPropagation();askDel('${f.id}')">×</button>
+        <div class="fcard-arrow">›</div>
+      </div>`;
+    d.addEventListener('click', () => openFiche(f.id));
+    el.appendChild(d);
+  });
+}
+
+function askDel(id) {
+  pendingDel = id;
+  document.getElementById('modal').classList.add('active');
+  document.getElementById('modal-confirm').onclick = () => {
+    save(load().filter(f => f.id !== pendingDel));
+    closeModal(); renderList();
+  };
+}
+function closeModal() { document.getElementById('modal').classList.remove('active'); }
+
+/* ══ NOUVELLE FICHE ══ */
+function newFiche() {
+  const f = { id:uid(), name:'', cat:'', club:'', grade:'', comp:'', date:'', result:'el', combats:[], prios:[], coach:'' };
+  const fiches = load(); fiches.push(f); save(fiches);
+  openFiche(f.id);
+}
+
+function openFiche(id) {
+  currentId = id;
+  const f = load().find(x => x.id === id);
+  if (!f) return;
+  renderFiche(f);
+  show('screen-edit');
+  document.getElementById('edit-scroll').scrollTop = 0;
+}
+
+/* ══ RENDU FICHE ══ */
+const ROPTS = [{v:'or',l:'🥇 Or'},{v:'ar',l:'🥈 Argent'},{v:'br',l:'🥉 Bronze'},{v:'5',l:'5e place'},{v:'7',l:'7e place'},{v:'el',l:'Éliminé(e)'}];
+
+function renderFiche(f) {
+  const opts = ROPTS.map(r => `<option value="${r.v}"${f.result===r.v?' selected':''}>${r.l}</option>`).join('');
+  document.getElementById('fiche-content').innerHTML = `
+    <div class="hd">
+      <div class="stripe"><div class="sb"></div><div class="sw"></div><div class="sr"></div></div>
+      <div class="hd-inner">
+        <div class="hd-eyebrow">Fiche bilan individuel · Compétition</div>
+        <input class="hd-name" placeholder="NOM Prénom" id="f-name" value="${esc(f.name)}" oninput="onNameInput(this.value)">
+        <div class="hd-row2">
+          <div class="hd-fields">
+            <div class="hd-field-row"><span>⚖️</span><input class="hdinput" placeholder="Catégorie" id="f-cat" value="${esc(f.cat)}"></div>
+            <div class="hd-field-row"><span>🏢</span><input class="hdinput" placeholder="Club" id="f-club" value="${esc(f.club)}"></div>
+            <div class="hd-field-row"><span>🎽</span><input class="hdinput" placeholder="Grade" id="f-grade" value="${esc(f.grade)}"></div>
+          </div>
+          <div class="hd-right">
+            <div class="rpill ${RMAP[f.result]||'res-el'}" id="f-rpill">
+              <select id="f-result" onchange="onResultChange(this.value)">${opts}</select>
+            </div>
+            <div class="hd-comp">
+              <input placeholder="Compétition" id="f-comp" value="${esc(f.comp)}">
+              <input placeholder="Date · Lieu" id="f-date" value="${esc(f.date)}">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="fiche-body">
+      <div class="sec-label"><span>Combats</span><button class="sec-add" onclick="addCombat()">+ Combat</button></div>
+      <div id="combats"></div>
+      <div class="sec-label" style="margin-top:8px"><span>Priorités de travail</span></div>
+      <div class="priority-block">
+        <div class="prio-header"><div class="prio-header-title">⚡ Plan d'action prioritaire</div></div>
+        <div class="prio-accent"></div>
+        <div class="prio-body" id="prios"></div>
+        <button class="prio-add" onclick="addPrio()">+ Ajouter une priorité</button>
+      </div>
+      <div class="coach-row">
+        <div class="coach-label">Note<br>Coach</div>
+        <textarea class="coach-input" id="f-coach" rows="3" placeholder="Contexte, ressenti, points à discuter…">${esc(f.coach)}</textarea>
+
+```
+  </div>
+</div>`;
+```
+
+document.getElementById(‘topbar-title’).textContent = f.name || ‘Nouvelle fiche’;
+(f.combats||[]).forEach(c => addCombat(c));
+(f.prios||[]).forEach(p => addPrio(p));
+}
+
+function onNameInput(v) {
+document.getElementById(‘topbar-title’).textContent = v || ‘Nouvelle fiche’;
+}
+
+function onResultChange(v) {
+document.getElementById(‘f-rpill’).className = ’rpill ’ + (RMAP[v]||‘res-el’);
+}
+
+/* ══ SAUVEGARDE ══ */
+function saveCurrent() {
+if (!currentId) return;
+const fiches = load();
+const idx = fiches.findIndex(x => x.id === currentId);
+if (idx === -1) return;
+const g = id => { const el = document.getElementById(id); return el ? el.value : ‘’; };
+
+const combats = [];
+document.querySelectorAll(’#combats .cc’).forEach(card => {
+const cid = card.id;
+const sel = card.querySelector(‘select’);
+const chips = [];
+card.querySelectorAll(’.pchip.active’).forEach(c => chips.push(c.textContent));
+const gs = k => parseInt(document.getElementById(k+’*’+cid)?.textContent||0);
+const gl = lid => { const a=[]; document.querySelectorAll(’#’+lid+’ .mini-text:not(.placeholder), #’+lid+’ .mini-input’).forEach(el=>{ const v=el.value||el.textContent; if(v&&v.trim())a.push(v.trim()); }); return a; };
+const gw = lid => { const a=[]; document.querySelectorAll(’#’+lid+’ .work-text:not(.placeholder), #’+lid+’ .work-input’).forEach(el=>{ const v=el.value||el.textContent; if(v&&v.trim())a.push(v.trim()); }); return a; };
+combats.push({
+result:sel?sel.value:’’, adv:g(’adv*’+cid), styleobs:g(‘obs_’+cid), chips,
+im:gs(‘im’), wm:gs(‘wm’), ym:gs(‘ym’), pm:gs(‘pm’),
+ic:gs(‘ic’), wc:gs(‘wc’), yc:gs(‘yc’), sc:gs(‘sc’),
+pos:gl(‘pos_’+cid), neg:gl(‘neg_’+cid),
+wt:gw(‘wt_’+cid), wta:gw(‘wta_’+cid), wmc:gw(‘wmc_’+cid),
+});
+});
+
+const prios = [];
+document.querySelectorAll(’#prios .prio-input’).forEach(i => { if(i.value.trim()) prios.push(i.value.trim()); });
+
+fiches[idx] = { …fiches[idx],
+name:g(‘f-name’), cat:g(‘f-cat’), club:g(‘f-club’), grade:g(‘f-grade’),
+comp:g(‘f-comp’), date:g(‘f-date’), result:g(‘f-result’)||‘el’,
+coach:g(‘f-coach’), combats, prios
+};
+save(fiches);
+}
+
+/* ══ COMBAT ══ */
+let combatN = 0;
+
+function addCombat(data) {
+combatN++;
+const n = combatN;
+const cid = ‘cc’ + n;
+const rv = data ? data.result : ‘’;
+const cardCls = rv===‘V’?‘cc cv’:rv===‘D’?‘cc cd’:‘cc cn’;
+const badgeCls = rv===‘V’?‘cc-badge ccb-v’:rv===‘D’?‘cc-badge ccb-d’:‘cc-badge ccb-n’;
+
+const chips = (list, grp) => list.map(c => {
+const active = data && data.chips && data.chips.includes(c) ? ’ active’ : ‘’;
+return `<span class="pchip${active}" onclick="toggleChip(this,'${grp}')">${c}</span>`;
+}).join(’’);
+
+const card = document.createElement(‘div’);
+card.className = cardCls; card.id = cid;
+card.innerHTML = `
+
+<div class="cc-head">
+  <div class="cc-num">${n}</div>
+  <div class="${badgeCls}" id="ccb_${cid}">
+    <select onchange="paintCC(this,'${cid}')">
+      <option value=""${!rv?' selected':''}>—</option>
+      <option value="V"${rv==='V'?' selected':''}>Victoire</option>
+      <option value="D"${rv==='D'?' selected':''}>Défaite</option>
+    </select>
+  </div>
+  <input class="cc-adv" placeholder="NOM Adversaire · Pays / Club" id="adv_${cid}" value="${esc(data&&data.adv||'')}">
+  <button class="cc-del" onclick="document.getElementById('${cid}').remove()">×</button>
+</div>
+<div class="cc-profile">
+  <div class="cc-profile-title">Profil adversaire</div>
+  <div class="profile-row"><span class="profile-key">Latéralité</span><div class="profile-chips">${chips(['Droitier','Gaucher'],'lat_'+cid)}</div></div>
+  <div class="profile-row"><span class="profile-key">Garde</span><div class="profile-chips">${chips(['Basse','Haute','Triceps','Croisée'],'garde_'+cid)}</div></div>
+  <div class="profile-row"><span class="profile-key">Profil</span><div class="profile-chips">${chips(['Offensif','Tactique'],'profil_'+cid)}</div></div>
+  <input class="profile-obs" placeholder="Technique principale, particularité…" id="obs_${cid}" value="${esc(data&&data.styleobs||'')}">
+</div>
+<div class="cc-scores">
+  <div class="cc-score-col">
+    <div class="score-title sct-m">✓ Marqués</div>
+    ${sr('Ippon','im_'+cid,'cv-g',data&&data.im||0)}
+    ${sr('Waza-ari','wm_'+cid,'cv-g',data&&data.wm||0)}
+    ${sr('Yuko','ym_'+cid,'cv-b',data&&data.ym||0)}
+    ${sr('Shido adv.','pm_'+cid,'cv-a',data&&data.pm||0)}
+  </div>
+  <div class="cc-score-col">
+    <div class="score-title sct-c">✕ Concédés</div>
+    ${sr('Ippon','ic_'+cid,'cv-r',data&&data.ic||0)}
+    ${sr('Waza-ari','wc_'+cid,'cv-r',data&&data.wc||0)}
+    ${sr('Yuko','yc_'+cid,'cv-r',data&&data.yc||0)}
+    ${sr('Shido','sc_'+cid,'cv-a',data&&data.sc||0)}
+  </div>
+</div>
+<div class="cc-obs">
+  <div class="cc-obs-col">
+    <div class="obs-title obs-pos">✓ Ce qui a bien marché</div>
+    <div class="mini-list" id="pos_${cid}"></div>
+    <button class="mini-add-btn" style="color:var(--green)" onclick="addMini('pos_${cid}','var(--green)')">＋ Ajouter</button>
+  </div>
+  <div class="cc-obs-col">
+    <div class="obs-title obs-neg">✕ Ce qui a moins bien marché</div>
+    <div class="mini-list" id="neg_${cid}"></div>
+    <button class="mini-add-btn" style="color:var(--red)" onclick="addMini('neg_${cid}','var(--red)')">＋ Ajouter</button>
+  </div>
+</div>
+<div class="cc-work">
+  <div class="cc-work-col">
+    <div class="work-title"><div class="wdot wd-t"></div>Technique</div>
+    <div class="work-list" id="wt_${cid}"></div>
+    <button class="work-add-btn" onclick="addWork('wt_${cid}')">＋ Ajouter</button>
+  </div>
+  <div class="cc-work-col">
+    <div class="work-title"><div class="wdot wd-a"></div>Tactique</div>
+    <div class="work-list" id="wta_${cid}"></div>
+    <button class="work-add-btn" onclick="addWork('wta_${cid}')">＋ Ajouter</button>
+  </div>
+  <div class="cc-work-col">
+    <div class="work-title"><div class="wdot wd-m"></div>Mental</div>
+    <div class="work-list" id="wmc_${cid}"></div>
+    <button class="work-add-btn" onclick="addWork('wmc_${cid}')">＋ Ajouter</button>
+  </div>
+</div>`;
+  document.getElementById('combats').appendChild(card);
+
+if (data) {
+(data.pos||[]).forEach(t => addMini(‘pos_’+cid,‘var(–green)’,t));
+(data.neg||[]).forEach(t => addMini(‘neg_’+cid,‘var(–red)’,t));
+(data.wt||[]).forEach(t  => addWork(‘wt_’+cid,t));
+(data.wta||[]).forEach(t => addWork(‘wta_’+cid,t));
+(data.wmc||[]).forEach(t => addWork(‘wmc_’+cid,t));
+}
+}
+
+function sr(lbl, id, cls, val) {
+return `<div class="score-row">
+<span class="score-lbl">${lbl}</span>
+<div class="counter">
+<button class="cnt-btn" onclick="decr('${id}')">−</button>
+<span class="cnt-val ${cls}" id="${id}">${val||0}</span>
+<button class="cnt-btn" onclick="incr('${id}')">+</button>
+</div>
+
+  </div>`;
+}
+
+function incr(id) { const e=document.getElementById(id); e.textContent=+e.textContent+1; }
+function decr(id) { const e=document.getElementById(id); if(+e.textContent>0) e.textContent=+e.textContent-1; }
+
+function paintCC(sel, cid) {
+const b=document.getElementById(‘ccb_’+cid), c=document.getElementById(cid);
+if(sel.value===‘V’){b.className=‘cc-badge ccb-v’;c.className=‘cc cv’;}
+else if(sel.value===‘D’){b.className=‘cc-badge ccb-d’;c.className=‘cc cd’;}
+else{b.className=‘cc-badge ccb-n’;c.className=‘cc cn’;}
+}
+
+function toggleChip(el, grp) {
+if(grp.startsWith(‘lat’)) el.closest(’.profile-chips’).querySelectorAll(’.pchip’).forEach(c=>c.classList.remove(‘active’));
+el.classList.toggle(‘active’);
+}
+
+/* ── MiniObs ── */
+function addMini(listId, color, val=’’) {
+const list = document.getElementById(listId);
+const item = document.createElement(‘div’); item.className=‘mini-item’;
+const dot = document.createElement(‘div’); dot.className=‘mini-dot’; dot.style.background=color;
+item.appendChild(dot);
+
+if (val) {
+const span = document.createElement(‘span’); span.className=‘mini-text’; span.textContent=val;
+span.onclick = () => toInput(span, color);
+item.appendChild(span);
+} else {
+const inp = makeTextInput(color, list);
+item.appendChild(inp);
+setTimeout(()=>inp.focus(), 50);
+}
+list.appendChild(item);
+}
+
+function toInput(span, color) {
+const inp = makeTextInput(color, span.parentNode.parentNode, span.textContent);
+span.parentNode.replaceChild(inp, span);
+inp.focus(); inp.select();
+}
+
+function makeTextInput(color, list, val=’’) {
+const inp = document.createElement(‘input’);
+inp.className=‘mini-input’; inp.style.borderBottomColor=color;
+inp.value=val; inp.placeholder=‘Observation…’;
+inp.onblur = () => {
+const span = document.createElement(‘span’);
+span.className = inp.value ? ‘mini-text’ : ‘mini-text placeholder’;
+span.textContent = inp.value || ‘Appuie pour écrire…’;
+span.onclick = () => toInput(span, color);
+inp.parentNode.replaceChild(span, inp);
+};
+inp.onkeydown = e => { if(e.key===‘Enter’) inp.blur(); };
+return inp;
+}
+
+/* ── WorkItem ── */
+function addWork(listId, val=’’) {
+const list = document.getElementById(listId);
+const n = list.querySelectorAll(’.work-item’).length + 1;
+const item = document.createElement(‘div’); item.className=‘work-item’;
+const num = document.createElement(‘span’); num.className=‘work-n’; num.textContent=n+’.’;
+item.appendChild(num);
+
+if (val) {
+const span = document.createElement(‘span’); span.className=‘work-text’; span.textContent=val;
+span.onclick = () => toWorkInput(span, list);
+item.appendChild(span);
+} else {
+const inp = makeWorkInput(list);
+item.appendChild(inp);
+setTimeout(()=>inp.focus(), 50);
+}
+list.appendChild(item);
+}
+
+function toWorkInput(span, list) {
+const inp = makeWorkInput(list, span.textContent);
+span.parentNode.replaceChild(inp, span);
+inp.focus(); inp.select();
+}
+
+function makeWorkInput(list, val=’’) {
+const inp = document.createElement(‘input’);
+inp.className=‘work-input’; inp.value=val; inp.placeholder=‘À travailler…’;
+inp.onblur = () => {
+const span = document.createElement(‘span’);
+span.className = inp.value ? ‘work-text’ : ‘work-text placeholder’;
+span.textContent = inp.value || ‘Appuie pour écrire…’;
+span.onclick = () => toWorkInput(span, list);
+inp.parentNode.replaceChild(span, inp);
+};
+inp.onkeydown = e => { if(e.key===‘Enter’) inp.blur(); };
+return inp;
+}
+
+/* ── Priorités ── */
+function addPrio(val=’’) {
+const body = document.getElementById(‘prios’);
+const n = body.querySelectorAll(’.prio-item’).length + 1;
+const lv = n<=3?n:((n-1)%3)+1;
+const item = document.createElement(‘div’);
+item.className = `prio-item prio-${lv}`;
+item.innerHTML = `<span class="prio-num pn-${lv}">${n}</span><input class="prio-input" placeholder="Priorité de travail…" value="${esc(val)}"><button class="prio-del" onclick="this.closest('.prio-item').remove();reNumPrios()">×</button>`;
+body.appendChild(item);
+if (!val) setTimeout(()=>item.querySelector(‘input’).focus(), 50);
+}
+
+function reNumPrios() {
+document.querySelectorAll(’#prios .prio-item’).forEach((it,i) => {
+const n=i+1, lv=n<=3?n:((n-1)%3)+1;
+it.className=`prio-item prio-${lv}`;
+it.querySelector(’.prio-num’).className=`prio-num pn-${lv}`;
+it.querySelector(’.prio-num’).textContent=n;
+});
+}
+
+/* ══ APERÇU PDF ══ */
+function showPreview() {
+saveCurrent();
+const f = load().find(x => x.id === currentId);
+if (!f) return;
+document.getElementById(‘preview-title’).textContent = f.name || ‘Aperçu’;
+document.getElementById(‘preview-paper’).innerHTML = buildPreviewHTML(f);
+show(‘screen-preview’);
+}
+
+function closePreview() { show(‘screen-edit’); }
+
+function buildPreviewHTML(f) {
+const resMap = {or:{l:‘🥇 Or’,s:‘background:#ffd700;color:#3a2a00’},ar:{l:‘🥈 Argent’,s:‘background:#d8d8d8;color:#222’},br:{l:‘🥉 Bronze’,s:‘background:#d4a574;color:#2a1000’},‘5’:{l:‘5e place’,s:`background:var(--green-bg);color:var(--green);border:1px solid var(--green-brd)`},‘7’:{l:‘7e place’,s:‘background:#f0f0f0;color:#666’},el:{l:‘Éliminé(e)’,s:`background:var(--red-l);color:var(--red);border:1px solid var(--red-b)`}};
+const res = resMap[f.result] || resMap.el;
+
+const miniList = (items, color) => {
+const fl = (items||[]).filter(Boolean);
+if (!fl.length) return `<span style="font-size:11px;color:#ccc;font-style:italic">—</span>`;
+return fl.map(t=>`<div style="display:flex;align-items:flex-start;gap:5px;margin-bottom:4px"><div style="width:5px;height:5px;border-radius:50%;background:${color};margin-top:6px;flex-shrink:0"></div><span style="font-size:11px;color:var(--ink2);line-height:1.4">${esc(t)}</span></div>`).join(’’);
+};
+const workList = (items) => {
+const fl = (items||[]).filter(Boolean);
+if (!fl.length) return `<span style="font-size:11px;color:#ccc;font-style:italic">—</span>`;
+return fl.map((t,i)=>`<div style="display:flex;gap:4px;margin-bottom:3px"><span style="font-size:9px;font-weight:700;color:var(--muted);min-width:13px">${i+1}.</span><span style="font-size:11px;color:var(--ink2);line-height:1.4">${esc(t)}</span></div>`).join(’’);
+};
+
+const combats = (f.combats||[]).map((c,i)=>{
+const bc=c.result===‘V’?‘var(–green)’:c.result===‘D’?‘var(–red)’:‘var(–line)’;
+const rl=c.result===‘V’?‘VICTOIRE’:c.result===‘D’?‘DÉFAITE’:’—’;
+const rc=c.result===‘V’?‘var(–green)’:c.result===‘D’?‘var(–red)’:’#888’;
+const rbg=c.result===‘V’?‘var(–green-bg)’:c.result===‘D’?‘var(–red-l)’:’#f0f0f0’;
+return `
+
+<div style="margin-bottom:10px;border:1.5px solid var(--line);border-left:4px solid ${bc};border-radius:4px;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);background:white">
+    <div style="width:22px;height:22px;border-radius:50%;background:var(--navy);color:white;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;flex-shrink:0">${i+1}</div>
+    <span style="font-family:'Syne',sans-serif;font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:10px;background:${rbg};color:${rc};flex-shrink:0">${rl}</span>
+    <span style="font-size:11px;font-weight:500;color:var(--ink2)">${esc(c.adv||'—')}</span>
+  </div>
+  <div style="background:var(--navy-l);padding:6px 10px;border-bottom:1px solid var(--line)">
+    <span style="font-family:'Syne',sans-serif;font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--navy)">${(c.chips||[]).join('  ·  ')||'—'}</span>
+    ${c.styleobs?`<div style="font-size:10px;color:var(--ink2);margin-top:3px;font-style:italic">${esc(c.styleobs)}</div>`:''}
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line);background:#fafafa">
+    <div style="padding:5px 10px;border-right:1px solid var(--line)">
+      <div style="font-family:'Syne',sans-serif;font-size:7px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:4px;padding-bottom:2px;border-bottom:1.5px solid var(--green)">✓ Marqués</div>
+      ${[['Ippon',c.im,'var(--green)'],['Waza-ari',c.wm,'var(--green)'],['Yuko',c.ym,'var(--navy)'],['Shido adv.',c.pm,'var(--amber)']].map(([l,v,col])=>`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--muted)">${l}</span><span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:${col}">${v||0}</span></div>`).join('')}
+    </div>
+    <div style="padding:5px 10px">
+      <div style="font-family:'Syne',sans-serif;font-size:7px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:4px;padding-bottom:2px;border-bottom:1.5px solid var(--red)">✕ Concédés</div>
+      ${[['Ippon',c.ic,'var(--red)'],['Waza-ari',c.wc,'var(--red)'],['Yuko',c.yc,'var(--red)'],['Shido',c.sc,'var(--amber)']].map(([l,v,col])=>`<div style="display:flex;justify-content:space-between;margin-bottom:2px"><span style="font-size:9px;color:var(--muted)">${l}</span><span style="font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:${col}">${v||0}</span></div>`).join('')}
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)">
+    <div style="padding:10px 12px;border-right:1px solid var(--line)">
+      <div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:7px;padding-bottom:4px;border-bottom:1.5px solid var(--green)">✓ Ce qui a bien marché</div>
+      ${miniList(c.pos,'var(--green)')}
+    </div>
+    <div style="padding:10px 12px">
+      <div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:7px;padding-bottom:4px;border-bottom:1.5px solid var(--red)">✕ Ce qui a moins bien marché</div>
+      ${miniList(c.neg,'var(--red)')}
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f4f6fb">
+    <div style="padding:9px 11px;border-right:1px solid var(--line)"><div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)">Technique</div>${workList(c.wt)}</div>
+    <div style="padding:9px 11px;border-right:1px solid var(--line)"><div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)">Tactique</div>${workList(c.wta)}</div>
+    <div style="padding:9px 11px"><div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--line)">Mental</div>${workList(c.wmc)}</div>
+  </div>
+</div>`;
+  }).join('');
+
+const prios = (f.prios||[]).filter(Boolean).map((p,i)=>{
+const cols=[‘var(–red)’,‘var(–amber)’,‘var(–navy)’]; const c=cols[i<3?i:i%3];
+return `<div style="display:flex;align-items:center;gap:10px;padding:6px 9px;border-radius:3px;border-left:4px solid ${c};background:#f8f9fc;margin-bottom:5px"><span style="font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:${c};min-width:16px">${i+1}</span><span style="font-size:11px;color:var(--ink2)">${esc(p)}</span></div>`;
+}).join(’’) || `<span style="font-size:11px;color:#ccc;font-style:italic">Aucune priorité</span>`;
+
+return `
+
+<div style="background:var(--navy)">
+  <div style="display:flex;height:5px"><div style="flex:1;background:var(--navy)"></div><div style="flex:1;background:white"></div><div style="flex:1;background:var(--red)"></div></div>
+  <div style="padding:14px 18px 12px">
+    <div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#7a95bb;margin-bottom:4px">Fiche bilan individuel · Compétition</div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:white;text-transform:uppercase;margin-bottom:5px">${esc(f.name||'—')}</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          ${f.cat?`<span style="font-size:11px;color:#7a95bb">⚖️ ${esc(f.cat)}</span>`:''}
+          ${f.club?`<span style="font-size:11px;color:#7a95bb">🏢 ${esc(f.club)}</span>`:''}
+          ${f.grade?`<span style="font-size:11px;color:#7a95bb">🎽 ${esc(f.grade)}</span>`:''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="${res.s};font-family:'Syne',sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:2px;display:inline-block;margin-bottom:5px">${res.l}</div>
+        ${f.comp?`<div style="font-size:10px;color:#7a95bb">${esc(f.comp)}</div>`:''}
+        ${f.date?`<div style="font-size:10px;color:#7a95bb">${esc(f.date)}</div>`:''}
+      </div>
+    </div>
+  </div>
+</div>
+<div style="padding:12px 16px 20px">
+  <div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--navy);padding:8px 0 6px;border-bottom:2px solid var(--navy);margin-bottom:10px">Combats</div>
+  ${combats||'<p style="font-size:11px;color:#ccc;font-style:italic">Aucun combat</p>'}
+  <div style="font-family:'Syne',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--navy);padding:8px 0 6px;border-bottom:2px solid var(--navy);margin-bottom:10px;margin-top:12px">Priorités de travail</div>
+  <div style="border:2px solid var(--navy);border-radius:4px;overflow:hidden;margin-bottom:12px">
+    <div style="background:var(--navy);padding:7px 12px"><span style="font-family:'Syne',sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:white">⚡ Plan d'action prioritaire</span></div>
+    <div style="height:3px;background:var(--red)"></div>
+    <div style="padding:9px 12px">${prios}</div>
+  </div>
+  ${f.coach?`<div style="background:var(--amber-bg);border:1.5px solid var(--amber-brd);border-radius:4px;padding:9px 11px;display:flex;gap:10px"><div style="font-family:'Syne',sans-serif;font-size:7px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--amber);white-space:nowrap;min-width:45px;line-height:1.6">Note<br>Coach</div><div style="font-size:11px;color:var(--ink2);line-height:1.6">${esc(f.coach)}</div></div>`:''}
+</div>`;
+}
+
+/* ══ GUIDE PDF ══ */
+const STEPS = {
+iphone:[
+{n:1,t:“Appuie sur <strong>🖨 Aperçu</strong> dans la barre du haut”},
+{n:2,t:“Dans l’aperçu, appuie sur l’icône <strong>Partager</strong> (carré avec flèche ↑) en bas de Safari”},
+{n:3,t:“Fais défiler et appuie sur <strong>Imprimer</strong>”},
+{n:4,t:“Fais un <strong>pinch to zoom</strong> sur l’aperçu miniature”},
+{n:5,t:“Appuie sur l’icône Partager ↑ et choisis <strong>Enregistrer en PDF</strong>”},
+{n:6,t:“Envoie le PDF par <strong>WhatsApp, Mail ou AirDrop</strong>”},
+],
+android:[
+{n:1,t:“Appuie sur <strong>🖨 Aperçu</strong> dans la barre du haut”},
+{n:2,t:“Appuie sur le menu <strong>⋮</strong> en haut à droite de Chrome”},
+{n:3,t:“Appuie sur <strong>Partager</strong> puis <strong>Imprimer</strong>”},
+{n:4,t:“Change l’imprimante en <strong>Enregistrer en PDF</strong>”},
+{n:5,t:“Appuie sur le bouton <strong>PDF ↓</strong> pour télécharger”},
+{n:6,t:“Envoie le PDF par <strong>WhatsApp ou Gmail</strong>”},
+]
+};
+
+let guideOs = ‘iphone’;
+function showGuide() {
+renderGuideSteps(guideOs);
+document.getElementById(‘guide’).classList.add(‘active’);
+}
+function closeGuide() { document.getElementById(‘guide’).classList.remove(‘active’); }
+function setGuideOs(os, btn) {
+guideOs = os;
+document.querySelectorAll(’.guide-tab’).forEach(t=>t.classList.remove(‘active’));
+btn.classList.add(‘active’);
+renderGuideSteps(os);
+}
+function renderGuideSteps(os) {
+document.getElementById(‘guide-steps’).innerHTML = STEPS[os].map(s=>` <div class="guide-step"> <div class="guide-step-n">${s.n}</div> <div class="guide-step-text">${s.t}</div> </div>`).join(’’);
+}
+
+/* ══ INIT ══ */
+renderList();
+renderGuideSteps(‘iphone’);
+</script>
+
+</body>
+</html>
