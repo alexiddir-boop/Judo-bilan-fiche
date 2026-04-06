@@ -19,14 +19,15 @@
   --ink:#111; --ink2:#2a2a2a; --muted:#7a7a7a; --line:#dde3ed; --bg:#edf0f5;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:var(--navy);color:var(--ink)}
+html{height:100%;height:-webkit-fill-available}
+body{min-height:100%;min-height:-webkit-fill-available;overflow:hidden;font-family:'Inter',sans-serif;background:var(--navy);color:var(--ink)}
 
 /* ── SCREENS ── */
-.screen{display:none;flex-direction:column;height:100%;overflow:hidden}
+.screen{display:none;flex-direction:column;height:100vh;height:-webkit-fill-available;overflow:hidden}
 .screen.active{display:flex}
 
 /* ══ LISTE ══ */
-.list-header{padding:20px 18px 14px;flex-shrink:0}
+.list-header{padding:env(safe-area-inset-top,20px) 18px 14px;padding-top:max(20px,env(safe-area-inset-top));flex-shrink:0}
 .list-logo{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .flag{display:flex;height:16px;border-radius:2px;overflow:hidden;width:26px}
 .flag div{flex:1}
@@ -58,7 +59,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 
 /* ══ ÉDITEUR ══ */
 #screen-edit{background:var(–bg)}
-.topbar{background:var(–navy);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar{background:var(–navy);padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:8px;flex-shrink:0}
 .topbar-back{background:transparent;border:none;color:white;font-size:26px;cursor:pointer;line-height:1;padding:0 4px;flex-shrink:0}
 .topbar-title{font-family:‘Syne’,sans-serif;font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:white;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topbar-guide{background:transparent;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.7);font-family:‘Syne’,sans-serif;font-size:10px;font-weight:800;padding:7px 10px;border-radius:2px;cursor:pointer;flex-shrink:0}
